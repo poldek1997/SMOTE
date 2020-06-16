@@ -68,7 +68,7 @@ for data_id, dataset in enumerate(dataset):
             for metric_id, metric in enumerate(metrics):
                 scores[preproc_id,data_id, fold_id, metric_id] = metrics[metric](y[test], y_pred)
 
-            
+         
 mean_scores = np.mean(scores, axis=3)
 mean_scores = np.mean(mean_scores, axis=2).T
 
@@ -109,44 +109,24 @@ significance_table = tabulate(np.concatenate(
 
 
 names_column1 = np.expand_dims(np.array(list(datasettry.keys())), axis=1)
-m = np.concatenate((names_column1, mean_scores), axis=1)
-m = tabulate(m, headers, tablefmt=".2f")
-
-
-print("\n\n",m)
-print("\n")
-print("Statistical significance (alpha = 0.05): \n", significance_table)
-print("\n")
-
-from scipy.stats import ttest_ind
-
-mean_scores1 = np.mean(scores, axis=3)
-mean_scores1 = np.mean(mean_scores1, axis=1).T
-
-t_statistic = np.zeros((len(preprocs), len(preprocs)))
-p_value = np.zeros((len(preprocs), len(preprocs)))
-
-for i in range(len(preprocs)):
-    for j in range(len(preprocs)):
-        t_statistic[i, j], p_value[i, j] = ttest_ind(mean_scores1[i], mean_scores1[j])
-
-advantage = np.zeros((len(preprocs), len(preprocs)))
-advantage[t_statistic > 0] = 1
-advantage_table = tabulate(np.concatenate(
-    (names_column, advantage), axis=1), headers)
-
-significance = np.zeros((len(preprocs), len(preprocs)))
-significance[p_value <= alfa] = 1
-significance_table = tabulate(np.concatenate(
-    (names_column, significance), axis=1), headers)
+scores_M = np.concatenate((names_column1, mean_scores), axis=1)
+scores_M = tabulate(scores_M, headers, tablefmt=".2f")
 
 stat_better = significance * advantage
 stat_better_table = tabulate(np.concatenate(
     (names_column, stat_better), axis=1), headers)
 
-print("Statistically significantly better:\n", stat_better_table)
 
-print("\n")
+
+
+
+print("\n\n",scores_M)
+print("\n\n W-statistic:\n", w_statistic_table)
+print("\n\n p-value:\n", p_value_table)
+print("\n\n Advantage:\n", advantage_table)
+print("\n\n Significance:\n", significance_table)
+print("\n\n Statistically significantly better:\n", stat_better_table)
+print("\n\n")
 
 
 
